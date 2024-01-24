@@ -1,20 +1,20 @@
-import {Webhook} from 'svix'
-import {headers} from 'next/headers'
-import {WebhookEvent} from '@clerk/nextjs/server'
-import {UserI} from '@/lib/database/user.model'
-import {createUser, deleteUser, updateUser} from "@/lib/actions/user.actions";
-import {clerkClient} from "@clerk/nextjs";
-import {NextResponse} from "next/server";
+import { Webhook } from 'svix'
+import { headers } from 'next/headers'
+import { WebhookEvent } from '@clerk/nextjs/server'
+import { createUser, deleteUser, updateUser } from '@/lib/actions/user.actions'
+import { clerkClient } from '@clerk/nextjs'
+import { NextResponse } from 'next/server'
 
 export async function POST(req: Request) {
-  console.log('GET POST CLERK')
-  const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET
 
+  // You can find this in the Clerk Dashboard -> Webhooks -> choose the webhook
+  const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET
 
   if (!WEBHOOK_SECRET) {
     throw new Error('Please add WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local')
   }
 
+  // Get the headers
   const headerPayload = headers();
   const svix_id = headerPayload.get("svix-id");
   const svix_timestamp = headerPayload.get("svix-timestamp");
@@ -51,35 +51,36 @@ export async function POST(req: Request) {
   }
 
   // Get the ID and type
-  const {id} = evt.data;
+  const { id } = evt.data;
   const eventType = evt.type;
 
-  if (eventType === 'user.created') {
-    console.log('evt', evt)
-    const {id, username, first_name, last_name, email_addresses, image_url} = evt.data
+  if(eventType === 'user.created') {
+    const { id, email_addresses, image_url, first_name, last_name, username } = evt.data;
+
     const user = {
       clerkId: id,
       email: email_addresses[0].email_address,
-      username: username,
+      username: username!,
       firstName: first_name,
       lastName: last_name,
-      photo: image_url
-    } as UserI
-    const newUser = await createUser(user)
+      photo: image_url,
+    }
 
-    if (newUser) {
+    const newUser = await createUser(user);
+
+    if(newUser) {
       await clerkClient.users.updateUserMetadata(id, {
         publicMetadata: {
           userId: newUser._id
         }
       })
-      return NextResponse.json({message: "OK", user: newUser})
     }
+
+    return NextResponse.json({ message: 'OK', user: newUser })
   }
 
-
   if (eventType === 'user.updated') {
-    const {id, image_url, first_name, last_name, username} = evt.data
+    const {id, image_url, first_name, last_name, username } = evt.data
 
     const user = {
       firstName: first_name,
@@ -90,20 +91,17 @@ export async function POST(req: Request) {
 
     const updatedUser = await updateUser(id, user)
 
-    return NextResponse.json({message: 'OK', user: updatedUser})
+    return NextResponse.json({ message: 'OK', user: updatedUser })
   }
 
   if (eventType === 'user.deleted') {
-    const {id} = evt.data
+    const { id } = evt.data
 
     const deletedUser = await deleteUser(id!)
 
-    return NextResponse.json({message: 'OK', user: deletedUser})
+    return NextResponse.json({ message: 'OK', user: deletedUser })
   }
 
-  return new Response('', {status: 200})
-
-
-  return new Response('', {status: 200})
+  return new Response('', { status: 200 })
 }
  
