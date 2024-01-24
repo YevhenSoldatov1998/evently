@@ -1,14 +1,35 @@
 import mongoose from "mongoose";
 
-export interface CategoryDocument extends Document {
-  _id: string
-  name: string
+export interface OrderDocument extends Document {
+  createdAt: Date
+  stripeId: string
+  totalAmount: string
+  event: {
+    _id: string
+    title: string
+  }
+  buyer: {
+    _id: string
+    firstName: string
+    lastName: string
+  }
 }
 
-const CategorySchema = new mongoose.Schema({
-  name: {type: String, required: true, unique: true}
+const OrderSchema = new mongoose.Schema({
+  createdAt: {type: Date, default: Date.now},
+  stripeId: {type: String, required: true},
+  totalAmount: {type: String},
+  event: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Event"
+  },
+  buyer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
+  }
+
 })
 
-const Category = mongoose.models.Category || mongoose.model('Category', CategorySchema)
+const Order = mongoose.models.Order || mongoose.model('Order', OrderSchema)
 
-export default Category
+export default Order
