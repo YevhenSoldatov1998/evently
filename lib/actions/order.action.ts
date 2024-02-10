@@ -4,7 +4,6 @@ import {CheckoutOrderParams, CreateOrderParams} from "@/types";
 import Stripe from "stripe";
 import {redirect} from "next/navigation";
 import {connectToDatabase} from "@/lib/database";
-import OrderModel from "@/lib/database/models/order.model";
 import Order from "@/lib/database/models/order.model";
 import {handleError} from "@/lib/utils";
 

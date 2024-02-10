@@ -10,11 +10,11 @@ import {handleError} from '@/lib/utils'
 
 import {
   CreateEventParams,
-  UpdateEventParams,
   DeleteEventParams,
   GetAllEventsParams,
   GetEventsByUserParams,
   GetRelatedEventsByCategoryParams,
+  UpdateEventParams,
 } from '@/types'
 
 const getCategoryByName = async (name: string) => {

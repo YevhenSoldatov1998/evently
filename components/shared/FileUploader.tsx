@@ -1,4 +1,9 @@
 import React, {Dispatch, FC, SetStateAction, useCallback} from 'react';
+// Note: `useUploadThing` is IMPORTED FROM YOUR CODEBASE using the `generateReactHelpers` function
+import {useDropzone} from "@uploadthing/react";
+import {generateClientDropzoneAccept} from "uploadthing/client";
+import {convertFileToUrl} from "@/lib/utils";
+import {Button} from "@/components/ui/button";
 
 
 type FileUploader = {
@@ -6,11 +11,6 @@ type FileUploader = {
   onFieldChange: (value: string) => void,
   setFiles: Dispatch<SetStateAction<File[]>>
 }
-// Note: `useUploadThing` is IMPORTED FROM YOUR CODEBASE using the `generateReactHelpers` function
-import {useDropzone} from "@uploadthing/react";
-import {generateClientDropzoneAccept} from "uploadthing/client";
-import {convertFileToUrl} from "@/lib/utils";
-import {Button} from "@/components/ui/button";
 
 
 const FileUploader: FC<FileUploader> = ({setFiles, onFieldChange, imageUrl}) => {
